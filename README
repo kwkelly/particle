@@ -1,0 +1,27 @@
+This program has been adapted from the var_coeff program written by Dhairya Malhotra.
+
+
+COMPILING
+---------
+Require: Elemental (development version), PvFMM
+PvFMM and Elemental must be in a place where the FindPVFMM and FindElemental cmake modules can find them.
+PvFMM can be downloaded from: https://github.com/dmalhotra/pvfmm
+Elemental can be found at: libelemental.org
+
+To compile:
+> mkdir build; cd build, cmake ..; make faims_tests
+May need to use a toolchain with cmake to detect correct config
+
+Troubleshooting:
+Modify CMakeLists.txt as necessary. May need to add more paths to where CMake looks for libs and headers
+
+
+COMMANDLINE OPTIONS
+-------------------
+-min_depth  <Int>    Minimum tree depth
+-max_depth  <Int>    Maximum tree depth
+-fmm_q      <Int>    Chebyshev polynomial degree
+-fmm_m      <Int>    Multipole order (+ve even integer)
+
+Example: ./build/faims_tests -fmm_q 6 -fmm_m 10 min_depth 3 -max_depth 5
+
