@@ -1,3 +1,5 @@
+#include <complex>
+#include "El.hpp"
 #include <cheb_node.hpp>
 #include <fmm_cheb.hpp>
 #include <fmm_node.hpp>
@@ -12,8 +14,8 @@
 #include <set>
 #include <funcs.hpp>
 
-#pragma once
-
+#ifndef PARTICLE_TREE_HPP
+#define PARTICLE_TREE_HPP
 
 namespace isotree{
 class ParticleTree{
@@ -32,7 +34,8 @@ class ParticleTree{
 		};
 		ParticleTree(MPI_Comm c = MPI_COMM_WORLD){};
 
-		ParticleTree(std::vector<double> &src_coord, std::vector<double> src_value, std::vector<double> &trg_coord, std::vector<double> &pt_coord, ParticleTree::AVec a_vec, pvfmm::BoundaryType bndry = pvfmm::FreeSpace, MPI_Comm comm = MPI_COMM_WORLD);
+		ParticleTree(std::vector<double> &src_coord, std::vector<double> &src_value, std::vector<double> &trg_coord, std::vector<double> &pt_coord, pvfmm::BoundaryType bndry = pvfmm::FreeSpace, MPI_Comm comm = MPI_COMM_WORLD);
+		ParticleTree(std::vector<double> &src_coord, std::vector<double> &trg_coord, std::vector<double> &pt_coord, pvfmm::BoundaryType bndry = pvfmm::FreeSpace, MPI_Comm comm = MPI_COMM_WORLD);
 
 		~ParticleTree(){
 			if(!fmm_mat) delete fmm_mat;
@@ -49,8 +52,6 @@ class ParticleTree{
 		std::vector<double> trg_coord;
 		std::vector<double> trg_value;
 
-		std::vector<double>* a_vec;
-
 		long long m,M,n,N,l,L;
 		static int mult_order;
 		static bool adap;
@@ -61,15 +62,16 @@ class ParticleTree{
 		MPI_Comm comm;
 
 		void RunFMM();
-		void Add(ParticleTree& other, std::complex<double> multiplier);
-		void Multiply(ParticleTree& other);
+		void ApplyFn(void (*fn)(const  double* coord, int n, double* out), AVec av);
+		void Add(ParticleTree& other, std::complex<double> multiplier, AVec av1, AVec av2);
+		void Multiply(ParticleTree& other, AVec av1, AVec av2);
 		void Conjugate();
 		void ScalarMultiply(std::complex<double> multiplier);
 		void Copy(const ParticleTree& other);
 		void Zero();
 		void SetupFMM(const pvfmm::Kernel<double>* kernel);
-		double Norm2();
-		std::vector<double> Integrate();
+		double Norm2(AVec av);
+		std::complex<double> Integrate();
 		std::vector<double> ChebPoints();
 
 	private:
@@ -81,4 +83,4 @@ class ParticleTree{
 
 }
 
-#include "particle_tree.txx"
+#endif

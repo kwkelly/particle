@@ -1,43 +1,38 @@
 #include <mpi.h>
-#include "invmed_tree.hpp"
+#include "particle_tree.hpp"
 #include "pvfmm.hpp"
+#include <string>
 #include "El.hpp"
 
-#pragma once
+#ifndef OPS_HPP
+#define OPS_HPP
+
 namespace isotree{
 
-typedef pvfmm::FMM_Node<pvfmm::Cheb_Node<double> > FMMNode_t;
-typedef pvfmm::FMM_Cheb<FMMNode_t> FMM_Mat_t;
-
-class Volume_FMM_op{
+class Global_to_det_op{
   public:
-		Volume_FMM_op(std::vector<double> detector_coord, void (*masking_fn)(const  double* coord, int n, double* out), const pvfmm::Kernel<double> *kernel, pvfmm::BoundaryType bndry = pvfmm::FreeSpace, MPI_Comm comm = MPI_COMM_WORLD);
-		~Volume_FMM_op();
+		Global_to_det_op(std::vector<double> &global_coord, std::vector<double> &det_coord, void (*masking_fn)(const  double* coord, int n, double* out), const pvfmm::Kernel<double> *kernel, pvfmm::BoundaryType bndry, std::string name, MPI_Comm comm = MPI_COMM_WORLD);
+		~Global_to_det_op();
 		void operator()(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &x, El::DistMatrix<El::Complex<double>,El::VC, El::STAR> &y);
 	private:
-		pvfmm::BoundaryType bndry;
-		ChebTree<FMM_Mat_t>* mask;
-		ChebTree<FMM_Mat_t>* temp;
-		std::vector<double> det_coord;
+		ParticleTree* mask = NULL;
+		ParticleTree* temp = NULL;
 		MPI_Comm comm;
+		std::string name;
 };
 
-class Particle_FMM_op{
+class Det_to_global_op{
   public:
-		Particle_FMM_op(std::vector<double> detector_coord, void (*masking_fn)(const  double* coord, int n, double* out), const pvfmm::Kernel<double> *kernel, MPI_Comm comm = MPI_COMM_WORLD);
-		~Particle_FMM_op();
+		Det_to_global_op(std::vector<double> &det_coord, std::vector<double> &global_coord, void (*masking_fn)(const  double* coord, int n, double* out), const pvfmm::Kernel<double> *kernel, pvfmm::BoundaryType bndry, std::string name,  MPI_Comm comm = MPI_COMM_WORLD);
+		~Det_to_global_op();
 		void operator()(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &y, El::DistMatrix<El::Complex<double>,El::VC, El::STAR> &x);
 	private:
-		pvfmm::BoundaryType bndry;
-		ChebTree<FMM_Mat_t>* mask;
-		ChebTree<FMM_Mat_t>* temp;
-		std::vector<double> detector_coord;
-		std::vector<double> trg_coord;
+		ParticleTree* mask = NULL;
+		ParticleTree* temp = NULL;
 		MPI_Comm comm;
-		pvfmm::PtFMM_Tree* pt_tree = NULL;
-		pvfmm::PtFMM* matrices = NULL;
-		int local_cheb_points;
-		std::vector<double> detector_values;
+		std::string name;
 };
 
 }
+
+#endif

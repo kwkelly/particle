@@ -1,8 +1,7 @@
 #include <pvfmm.hpp>
 
-#pragma once
-
-
+#ifndef HELM_KERNELS_HPP
+#define HELM_KERNELS_HPP
 /*
  * Function for the helm kernel that accepts a variable which is the wavenumber k
  */
@@ -45,4 +44,4 @@ const pvfmm::Kernel<double> helm_kernel_low=pvfmm::BuildKernel<double, helm_kern
 const pvfmm::Kernel<double> helm_kernel_conj_low=pvfmm::BuildKernel<double, helm_kernel_conj_low_fn>("helm_kernel_conj_low", 3, std::pair<int,int>(2,2));
 
 
-#include "helm_kernels.txx"
+#endif

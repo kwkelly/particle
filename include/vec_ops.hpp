@@ -1,7 +1,9 @@
 #include <vector>
+#include "mpi.h"
 #include <complex>
 
-#pragma once
+#ifndef VEC_OPS_HPP
+#define VEC_OPS_HPP
 
 	//y = ax+y
 template<typename T>
@@ -17,4 +19,4 @@ void scalar_multiply(std::vector<T> &y, const std::complex<T> a);
 
 double norm2(std::vector<double> &y, MPI_Comm comm);
 
-#include "vec_ops.txx"
+#endif

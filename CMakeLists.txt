@@ -53,7 +53,7 @@ include_directories("include")
 include_directories("extern/rsvd/include")
 
 
-add_executable(pts_test test/pts_test.cpp src/point_distribs.cpp src/funcs.cpp)
+add_executable(pts_test test/pts_test.cpp src/point_distribs.cpp src/funcs.cpp src/convert_elemental.cpp src/helm_kernels.cpp src/particle_tree.cpp src/vec_ops.cpp src/ops.cpp)
 
 message(STATUS ${pvfmm_INCLUDE_DIRS})
 message(STATUS ${MPI_CXX_LIBRARIES})

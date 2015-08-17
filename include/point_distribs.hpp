@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef POINT_DISTRIBS_HPP
+#define POINT_DISTRIBS_HPP
 /*
  * Generate equidistributed points in the unit cube between lmin and lmax in each dimension
  */
@@ -45,3 +45,4 @@ std::vector<double> test_pts();
  */
 std::vector<double> equisph(int n_points, double rad);
 
+#endif

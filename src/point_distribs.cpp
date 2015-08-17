@@ -85,10 +85,10 @@ std::vector<Real_t> rand_sph_point_distrib(size_t N, Real_t rad, MPI_Comm comm){
 	size_t N_local=end-start;
 
 	for (int i = 0; i < N_local; i++) {
-		val = 2*rad*((size_t)drand48()) - rad;
+		val = 2*rad*((Real_t)drand48()) - rad;
 		z.push_back(val);
 		theta.push_back(asin(z[i]/rad));
-		val = 2*M_PI*((size_t)drand48());
+		val = 2*M_PI*((Real_t)drand48());
 		phi.push_back(val);
 		src_points.push_back(rad*cos(theta[i])*cos(phi[i])+.5);
 		src_points.push_back(rad*cos(theta[i])*sin(phi[i])+.5);

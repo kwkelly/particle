@@ -75,6 +75,8 @@ void two_pt_sol_fn(const double* coord, int n, double* out);
 
 void eight_pt_sol_fn(const double* coord, int n, double* out);
 
+void eight_pt_conj_sol_fn(const double* coord, int n, double* out);
+
 void cos2pix_fn(const  double* coord, int n, double* out);
 
 void sin2pix_fn(const  double* coord, int n, double* out);

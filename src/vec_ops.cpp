@@ -1,6 +1,9 @@
 #include <vector>
+#include <cassert>
 #include <complex>
 #include <omp.h>
+#include "mpi.h"
+#include "vec_ops.hpp"
 
 	//y = ax+y
 template<typename T>
@@ -87,3 +90,13 @@ double norm2(std::vector<double> &y, MPI_Comm comm){
 	MPI_Allreduce(&local_norm,&norm,1,MPI_DOUBLE,MPI_SUM,comm);
 	return norm;
 }
+
+
+template
+void add(std::vector<double> &y, std::vector<double> &x, std::complex<double> a);
+
+template
+void scalar_multiply(std::vector<double> &y, const std::complex<double> a);
+
+template
+void multiply(std::vector<double> &y, const std::vector<double> &x);
