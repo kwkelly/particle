@@ -31,6 +31,19 @@ void helm_kernel_low_fn(double* r_src, int src_cnt, double* v_src, int dof, doub
 
 void helm_kernel_conj_low_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
 
+void helm_kernel_xlow_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
+
+void helm_kernel_conj_xlow_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
+
+/*
+ * High wave number kernels with wavenumber =+/-10.0
+ */
+void helm_kernel_10_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
+
+void helm_kernel_conj_10_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
+
+// build kernels
+
 const pvfmm::Kernel<double> helm_kernel=pvfmm::BuildKernel<double, helm_kernel_fn>("helm_kernel", 3, std::pair<int,int>(2,2));
 
 const pvfmm::Kernel<double> helm_kernel_conj=pvfmm::BuildKernel<double, helm_kernel_conj_fn>("helm_kernel_conj", 3, std::pair<int,int>(2,2));
@@ -42,6 +55,14 @@ const pvfmm::Kernel<double> helm_kernel_conj3=pvfmm::BuildKernel<double, helm_ke
 const pvfmm::Kernel<double> helm_kernel_low=pvfmm::BuildKernel<double, helm_kernel_low_fn>("helm_kernel_low", 3, std::pair<int,int>(2,2));
 
 const pvfmm::Kernel<double> helm_kernel_conj_low=pvfmm::BuildKernel<double, helm_kernel_conj_low_fn>("helm_kernel_conj_low", 3, std::pair<int,int>(2,2));
+
+const pvfmm::Kernel<double> helm_kernel_xlow=pvfmm::BuildKernel<double, helm_kernel_xlow_fn>("helm_kernel_xlow", 3, std::pair<int,int>(2,2));
+
+const pvfmm::Kernel<double> helm_kernel_conj_xlow=pvfmm::BuildKernel<double, helm_kernel_conj_xlow_fn>("helm_kernel_conj_xlow", 3, std::pair<int,int>(2,2));
+
+const pvfmm::Kernel<double> helm_kernel_10=pvfmm::BuildKernel<double, helm_kernel_10_fn>("helm_kernel_10", 3, std::pair<int,int>(2,2));
+
+const pvfmm::Kernel<double> helm_kernel_conj_10=pvfmm::BuildKernel<double, helm_kernel_conj_10_fn>("helm_kernel_conj_10", 3, std::pair<int,int>(2,2));
 
 
 #endif

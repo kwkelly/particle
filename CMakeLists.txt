@@ -54,6 +54,7 @@ include_directories("extern/rsvd/include")
 
 
 add_executable(pts_test test/pts_test.cpp src/point_distribs.cpp src/funcs.cpp src/convert_elemental.cpp src/helm_kernels.cpp src/particle_tree.cpp src/vec_ops.cpp src/ops.cpp)
+add_executable(faims test/faims.cpp src/point_distribs.cpp src/funcs.cpp src/convert_elemental.cpp src/helm_kernels.cpp src/particle_tree.cpp src/vec_ops.cpp src/ops.cpp)
 
 message(STATUS ${pvfmm_INCLUDE_DIRS})
 message(STATUS ${MPI_CXX_LIBRARIES})
@@ -63,3 +64,4 @@ set(LIBS ${LIBS} ${pvfmm_LIBRARY} ${Elemental_LIBRARIES} ${MPI_CXX_LIBRARIES})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
 
 target_link_libraries(pts_test ${LIBS})
+target_link_libraries(faims ${LIBS})

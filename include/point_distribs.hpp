@@ -43,6 +43,22 @@ std::vector<double> test_pts();
  * Note that this function is not rwritten to  be parallel friendly, i.e. all points
  * will be created on all procs
  */
-std::vector<double> equisph(int n_points, double rad);
+template <typename Real_t>
+std::vector<Real_t> equisph(size_t n_points, Real_t rad, MPI_Comm comm);
+/*
+ * Generate equidistant points on a line along one of the coordinate axes
+ */
+template <class Real_t>
+std::vector<Real_t> unif_line(size_t N, int plane, Real_t lmin, Real_t lmax, MPI_Comm comm);
+
+/*
+ * Generate n_points equidistributed points on the
+ * surface of a sphere of radius rad
+ * http://www.openprocessing.org/sketch/41142
+ */
+template <class Real_t>
+std::vector<Real_t> fib_sph(size_t N, Real_t r, MPI_Comm comm);
+ 
+
 
 #endif

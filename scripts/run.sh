@@ -18,7 +18,7 @@ where:
 -d  depth
 -n  number of mpi tasks"
 
-while getopts "h?t:q:d:m:n:" opt; do
+while getopts "h?t:q:d:m:n:r:" opt; do
 	case "$opt" in
 		h|\?)
 		echo "$usage"
@@ -33,6 +33,8 @@ while getopts "h?t:q:d:m:n:" opt; do
 		q) QS=$OPTARG
 		;;
 		n) NS=$OPTARG
+		;;
+		r) RDS=$OPTARG
 		;;
 	esac
 done
@@ -53,12 +55,14 @@ for M in ${MS}
 do
 for N in ${NS}
 do
+for RD in ${RDS}
+do
 	while : ; do
 		[[ $(squeue -u $USER | tail -n +1 | wc -l) -lt $MAX_QUEUE_DEFAULT ]] && break
 		echo "Pausing until the queue empties enough to add a new one."
 		sleep $WAIT_TIME_DEFAULT
 	done
-	JOBNAME=tests-$DEPTH-$Q-$M-$N
+	JOBNAME=tests-$DEPTH-$M-$RD
 cat <<-EOS | sbatch
 	#!/bin/bash
 
@@ -73,10 +77,11 @@ cat <<-EOS | sbatch
 	##SBATCH --mail-type=end
 	#SBATCH -A PADAS
 	cd ~/projects/particle/build/
-	ibrun ./pts_test -fmm_m $M -min_depth $DEPTH -max_depth $DEPTH -dir /work/02370/kwkelly/maverick/files/results/
+	ibrun ./pts_test -fmm_m $M -min_depth $DEPTH -max_depth $DEPTH -dir /work/02370/kwkelly/maverick/files/results/ -R_d $RD
 
 	exit 0
 	EOS
+done
 done
 done
 done

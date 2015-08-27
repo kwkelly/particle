@@ -41,7 +41,7 @@ void Global_to_det_op::operator()(const El::DistMatrix<El::Complex<double>,El::V
 	ParticleTree::AVec sv = ParticleTree::AVec::src;
 
 	elemental2tree(x,*temp,sv);
-	temp->Multiply(*mask,sv,sv);
+	//temp->Multiply(*mask,sv,sv);
 	temp->RunFMM();
 
 	tree2elemental(*temp,y,tv);
@@ -79,7 +79,7 @@ void Det_to_global_op::operator()(const El::DistMatrix<El::Complex<double>,El::V
 
 	elemental2tree(y,*temp,sv);
 	temp->RunFMM();
-	temp->Multiply(*mask,tv,tv);
+	//temp->Multiply(*mask,tv,tv);
 
 	tree2elemental(*temp,x,tv);
 

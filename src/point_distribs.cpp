@@ -6,6 +6,19 @@
 #include <cassert>
 #include "point_distribs.hpp"
 
+
+std::vector<int> exscan(const std::vector<int> &x){
+	int ll = x.size();
+	std::vector<int> y(ll);
+	y[0] = 0;
+
+	for(int i=1;i<ll;i++){
+		y[i] = y[i-1] + x[i-1];
+	}
+	
+	return y;
+}
+
 template <class Real_t>
 std::vector<Real_t> unif_point_distrib(size_t N, Real_t lmin, Real_t lmax, MPI_Comm comm){
 
@@ -188,8 +201,8 @@ std::vector<double> test_pts(){
 	return pts;
 }
 
-
-std::vector<double> equisph(int n_points, double rad){
+template<typename Real_t>
+std::vector<Real_t> equisph(size_t n_points, Real_t rad, MPI_Comm comm){
 
 	/*
 	 * Generate n_points equidistributed points on the
@@ -199,29 +212,147 @@ std::vector<double> equisph(int n_points, double rad){
 	 * will be created on all procs
 	 */
 
-	std::vector<double> points;
+	int rank, np;
+	MPI_Comm_rank(comm,&rank);
+	MPI_Comm_size(comm,&np);
+
+	std::vector<Real_t> points;
+
+	std::cout << "n_points: " << n_points << std::endl;
 	
 	int n_count = 0;
-	double a = 4*M_PI*rad*rad/n_points;
-	double d = sqrt(a);
-	double M_theta  = round(M_PI/d);
-	double d_theta = M_PI/M_theta;
-	double d_phi = a/d_theta;
-	for(int m=0;m<M_theta;m++){
-		double theta = M_PI*(m+0.5)/M_theta;
-		double M_phi = round(2*M_PI*sin(theta)/d_phi);
-		for(int n=0;n<M_phi;n++){
-			double phi = 2*M_PI*n/M_phi;
-			points.push_back(rad*sin(theta)*cos(phi)+.5);
-			points.push_back(rad*sin(theta)*sin(phi)+.5);
-			points.push_back(rad*cos(theta)+.5);
-			n_count++;
+	if(!rank){
+		Real_t a = 4*M_PI*(rad*rad)/n_points;
+		Real_t d = sqrt(a);
+		size_t M_theta  = round(M_PI/d);
+		Real_t d_theta = M_PI/M_theta;
+		Real_t d_phi = a/d_theta;
+		for(size_t m=0;m<M_theta;m++){
+			Real_t theta = M_PI*(m+0.5)/M_theta;
+			size_t M_phi = round(2*M_PI*sin(theta)/d_phi);
+			for(size_t n=0;n<M_phi;n++){
+				Real_t phi = 2*M_PI*n/M_phi;
+				//std::cout << "phi: " << phi << std::endl;
+				//std::cout << "theta: " << theta << std::endl;
+				//std::cout << "x: " << (rad*sin(theta)*cos(phi)+.5) << std::endl;
+				//std::cout << "y: " << (rad*sin(theta)*sin(phi)+.5) << std::endl;
+				//std::cout << "z: " << (rad*cos(theta)+.5) << std::endl;
+				points.push_back(rad*sin(theta)*cos(phi)+.5);
+				points.push_back(rad*sin(theta)*sin(phi)+.5);
+				points.push_back(rad*cos(theta)+.5);
+				n_count++;
+			}
 		}
 	}
-	std::cout << "This many points were created: " << n_count << std::endl;
+	//MPI_Bcast(&n_count,1,MPI_INT,0,comm);
+	//int N_total = n_count;
+	//int start= rank   *N_total/np;
+	//int end  =(rank+1)*N_total/np;
+	//int N_local=end-start;
+	//std::vector<Real_t> points_dist(N_local);
+	//int disps = 0;
+	//std::vector<int> all_size(np);
+	//MPI_Allgather(&N_local,1,MPI_INT,&all_size[0],1,MPI_INT,comm);
+	//std::vector<int> scan_size = exscan(all_size);
+	std::cout << "n_count: " << n_count << std::endl;
+
+
+
+	//MPI_Scatterv(&points[0],&all_size[0],&scan_size[0],MPI_DOUBLE,&points_dist[0],all_size[rank],MPI_DOUBLE,0,comm);
+	//points_dist = points;
 	return points;
 			
 }
+
+
+template<typename Real_t>
+std::vector<Real_t> fib_sph(size_t N, Real_t r, MPI_Comm comm){
+
+	/*
+	 * Generate n_points equidistributed points on the
+	 * surface of a sphere of radius rad
+	 * http://www.openprocessing.org/sketch/41142
+	 */
+
+	int rank, np;
+	MPI_Comm_rank(comm,&rank);
+	MPI_Comm_size(comm,&np);
+	
+	int start= rank   *N/np + 1;
+	int end  =(rank+1)*N/np + 1;
+	int N_local=end-start;
+
+	Real_t phi = (sqrt(5.0)+1.0)/2.0 - 1.0;
+	Real_t ga = phi*2.0*M_PI;
+
+	std::vector<Real_t> points;
+	for(int i=start;i<end;i++){
+		Real_t lon =  ga*i;
+		Real_t lat = asin(-1.0+2.0*i/Real_t(N));
+		points.push_back(r*cos(lat)*cos(lon) +0.5);
+		points.push_back(r*cos(lat)*sin(lon) + 0.5);
+		points.push_back(r*sin(lat) + 0.5);
+	}
+	return points;
+}
+
+
+
+
+template <class Real_t>
+std::vector<Real_t> unif_line(size_t N, int axis, Real_t lmin, Real_t lmax, MPI_Comm comm){
+	/*
+	 * Generate uniformly spaced points on a plane at distance pos from the given axis
+	 * plane == 0 = yz plane
+	 * plane == 1 = xz plane
+	 * plane == 2 = xy plane
+	 */
+
+	int np, myrank;
+	MPI_Comm_size(comm, &np);
+	MPI_Comm_rank(comm, &myrank);
+
+	assert(axis == 0 or axis == 1 or axis == 2);
+
+	// generate n_points points sources equally spaced on a plane
+	// plane == 0 = x axis
+	// plane == 1 = y axis
+	// plane == 2 = z axis
+
+	std::vector<Real_t> coord;
+	{
+		size_t NN=N;
+		double spacing = 1.0/(NN);
+		size_t N_total=NN;
+		size_t start= myrank   *N_total/np;
+		size_t end  =(myrank+1)*N_total/np;
+		switch(axis){
+			case 0:
+				for(size_t i=start;i<end;i++){
+					coord.push_back( ((lmax-lmin) * ((Real_t)((i/ 1  )%NN)+0.5)/NN) + lmin );
+					coord.push_back( 0.5                                                   );
+					coord.push_back( 0.5                                                   );
+				}
+				break;
+			case 1:
+				for(size_t i=start;i<end;i++){
+					coord.push_back( 0.5                                                   );
+					coord.push_back( ((lmax-lmin) * ((Real_t)((i/ 1  )%NN)+0.5)/NN) + lmin );
+					coord.push_back( 0.5                                                   );
+				}
+				break;
+			case 2:
+				for(size_t i=start;i<end;i++){
+					coord.push_back( 0.5                                                   );
+					coord.push_back( 0.5                                                   );
+					coord.push_back( ((lmax-lmin) * ((Real_t)((i/ 1  )%NN)+0.5)/NN) + lmin );
+				}
+				break;
+		}
+	}
+	return coord;
+}
+
 
 /*
  * Instantiate tempaltes
@@ -238,3 +369,12 @@ std::vector<double> rand_sph_point_distrib(size_t N, double rad, MPI_Comm comm);
 
 template
 std::vector<double> unif_plane(size_t N, int plane, double pos, MPI_Comm comm);
+
+template
+std::vector<double> unif_line(size_t N, int axis, double lmin, double lmax, MPI_Comm comm);
+
+template
+std::vector<double> equisph(size_t n_points, double rad, MPI_Comm comm);
+
+template
+std::vector<double> fib_sph(size_t N, double r, MPI_Comm comm);
