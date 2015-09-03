@@ -11,6 +11,7 @@ RS_DEFAULT=1
 RD_DEFAULT=10
 RB_DEFAULT=10
 NSCATTERS_DEFAULT=25
+GAMMA_DEFAULT=0.001
 
 
 usage="$(basename "$0") [-h] [-?] [-t -d -m -n --nd --rd --ns --rs --rb] -- run job script
@@ -49,6 +50,8 @@ while getopts "h?t:q:d:m:n:-:" opt; do
 				;;
 				nscatters) NSCATTERS="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
 				;;
+				gamma) GAMMAS="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
+				;;
 			esac
 			;;
 		t) MAX_TIME=$OPTARG
@@ -84,6 +87,7 @@ NSS=${NSS:-$(echo $NS_DEFAULT)}
 RSS=${RSS:-$(echo $RS_DEFAULT)}
 RBS=${RBS:-$(echo $RB_DEFAULT)}
 NSCATTERS=${NSCATTERS:-$(echo $NSCATTERS_DEFAULT)}
+GAMMAS=${GAMMAS:-$(echo $GAMMA_DEFAULT)}
 
 
 for M in ${MS}
@@ -103,6 +107,8 @@ do
 for DEPTH in ${DEPTHS}
 do
 for NSCATTER in ${NSCATTERS}
+do
+for GAMMA in ${GAMMAS}
 do
 	while : ; do
 		[[ $(squeue -u $USER | tail -n +1 | wc -l) -lt $MAX_QUEUE_DEFAULT ]] && break
@@ -124,10 +130,11 @@ cat <<-EOS | sbatch
 	##SBATCH --mail-type=end
 	#SBATCH -A PADAS
 	cd ~/projects/particle/build/
-	ibrun ./faims -fmm_m $M -min_depth $DEPTH -max_depth $DEPTH -dir /work/02370/kwkelly/maverick/files/results/ -R_d $RD -R_s $RS -N_d $ND -N_s $NS -R_b $RB -N_scatter $NSCATTER
+	ibrun ./faims -fmm_m $M -min_depth $DEPTH -max_depth $DEPTH -dir /work/02370/kwkelly/maverick/files/results/ -R_d $RD -R_s $RS -N_d $ND -N_s $NS -R_b $RB -N_scatter $NSCATTER -gamma $GAMMA
 
 	exit 0
 	EOS
+done
 done
 done
 done

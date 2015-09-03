@@ -9,29 +9,56 @@
 
 namespace isotree{
 
-class Global_to_det_op{
+class FMM_op{
   public:
-		Global_to_det_op(std::vector<double> &global_coord, std::vector<double> &det_coord, void (*masking_fn)(const  double* coord, int n, double* out), const pvfmm::Kernel<double> *kernel, pvfmm::BoundaryType bndry, std::string name, MPI_Comm comm = MPI_COMM_WORLD);
-		~Global_to_det_op();
+		FMM_op(std::vector<double> &src_coord, std::vector<double> &trg_coord, const pvfmm::Kernel<double> *kernel, pvfmm::BoundaryType bndry, std::string name, MPI_Comm comm = MPI_COMM_WORLD);
+		~FMM_op();
 		void operator()(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &x, El::DistMatrix<El::Complex<double>,El::VC, El::STAR> &y);
 	private:
-		ParticleTree* mask = NULL;
 		ParticleTree* temp = NULL;
 		MPI_Comm comm;
 		std::string name;
 };
 
-class Det_to_global_op{
+class B_op{
   public:
-		Det_to_global_op(std::vector<double> &det_coord, std::vector<double> &global_coord, void (*masking_fn)(const  double* coord, int n, double* out), const pvfmm::Kernel<double> *kernel, pvfmm::BoundaryType bndry, std::string name,  MPI_Comm comm = MPI_COMM_WORLD);
-		~Det_to_global_op();
-		void operator()(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &y, El::DistMatrix<El::Complex<double>,El::VC, El::STAR> &x);
+		B_op(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &S_G, const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &V_G, const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &U_hat, std::string name, const El::Grid &g, MPI_Comm comm = MPI_COMM_WORLD);
+		~B_op();
+		void operator()(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &x, El::DistMatrix<El::Complex<double>,El::VC, El::STAR> &y);
 	private:
-		ParticleTree* mask = NULL;
-		ParticleTree* temp = NULL;
 		MPI_Comm comm;
+		const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> S_G;
+		const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> V_G;
+		const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> U_hat;
+		//El::DistMatrix<El::Complex<double>,El::VC,El::STAR> x_U_hat;
+		El::DistMatrix<El::Complex<double>,El::VC,El::STAR> y_rect;
+		int R_d;
+		int R_s;
 		std::string name;
 };
+
+class Bt_op{
+  public:
+		Bt_op(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &S_G, const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &V_G, const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &U_hat, std::string name, const El::Grid &g, MPI_Comm comm = MPI_COMM_WORLD);
+		~Bt_op();
+		void operator()(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &x, El::DistMatrix<El::Complex<double>,El::VC, El::STAR> &y);
+	private:
+		MPI_Comm comm;
+		const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> S_G;
+		const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> V_G;
+		const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> U_hat;
+		El::DistMatrix<El::Complex<double>,El::VC,El::STAR> x_rect;
+		El::DistMatrix<El::Complex<double>,El::VC,El::STAR> U_hat_conj;
+		El::DistMatrix<El::Complex<double>,El::VC,El::STAR> temp2;
+		El::DistMatrix<El::Complex<double>,El::VC,El::STAR> temp3;
+		El::DistMatrix<El::Complex<double>,El::VC,El::STAR> ones;
+		int R_d;
+		int R_s;
+		int N;
+		std::string name;
+};
+
+
 
 }
 
