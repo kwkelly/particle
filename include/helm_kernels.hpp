@@ -41,6 +41,18 @@ void helm_kernel_conj_xlow_fn(double* r_src, int src_cnt, double* v_src, int dof
 void helm_kernel_10_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
 
 void helm_kernel_conj_10_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
+/*
+ * High wave number kernels with wavenumber =+/-100.0
+ */
+void helm_kernel_100_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
+
+void helm_kernel_conj_100_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
+/*
+ * High wave number kernels with wavenumber =+/-1000.0
+ */
+void helm_kernel_1000_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
+
+void helm_kernel_conj_1000_fn(double* r_src, int src_cnt, double* v_src, int dof, double* r_trg, int trg_cnt, double* k_out, pvfmm::mem::MemoryManager* mem_mgr);
 
 // build kernels
 
@@ -64,5 +76,12 @@ const pvfmm::Kernel<double> helm_kernel_10=pvfmm::BuildKernel<double, helm_kerne
 
 const pvfmm::Kernel<double> helm_kernel_conj_10=pvfmm::BuildKernel<double, helm_kernel_conj_10_fn>("helm_kernel_conj_10", 3, std::pair<int,int>(2,2));
 
+const pvfmm::Kernel<double> helm_kernel_100=pvfmm::BuildKernel<double, helm_kernel_100_fn>("helm_kernel_100", 3, std::pair<int,int>(2,2));
+
+const pvfmm::Kernel<double> helm_kernel_conj_100=pvfmm::BuildKernel<double, helm_kernel_conj_100_fn>("helm_kernel_conj_100", 3, std::pair<int,int>(2,2));
+
+const pvfmm::Kernel<double> helm_kernel_1000=pvfmm::BuildKernel<double, helm_kernel_1000_fn>("helm_kernel_1000", 3, std::pair<int,int>(2,2));
+
+const pvfmm::Kernel<double> helm_kernel_conj_1000=pvfmm::BuildKernel<double, helm_kernel_conj_1000_fn>("helm_kernel_conj_100", 3, std::pair<int,int>(2,2));
 
 #endif
