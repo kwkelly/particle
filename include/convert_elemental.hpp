@@ -48,6 +48,16 @@ void vec2elemental(const std::vector<double> &vec, El::DistMatrix<El::Complex<do
  */
 void elemental2vec(const El::DistMatrix<El::Complex<double>,El::VC,El::STAR> &Y, std::vector<double> &vec);
 
+/*
+ * Convert a std::vector to an elemental vector of the given distribution. As before, thise well reorder the data
+ */
+void coordvec2elemental(const std::vector<double> &vec, El::DistMatrix<double,El::VC,El::STAR > &Y);
+
+/*
+ * Convert an elemental vector to a std::vector of the given distribution. As before, thise well reorder the data
+ */
+void elemental2coodvec(const El::DistMatrix<double,El::VC,El::STAR> &Y, std::vector<double> &vec);
+
 }
 
 #endif
